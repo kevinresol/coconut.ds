@@ -1,0 +1,21 @@
+{
+  "name": "coconut.ds",
+  "license": "MIT",
+  "tags": [
+    "data",
+    "cross",
+    "ds",
+    "reactive",
+    "observable",
+    "coconut"
+  ],
+  "classPath": "src",
+  "contributors": [
+    "kevinresol"
+  ],
+  "releasenote": "initial release",
+  "version": "0.0.0",
+  "dependencies": {
+    "coconut.data": ""
+  }
+}

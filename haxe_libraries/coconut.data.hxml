@@ -1,0 +1,7 @@
+# @install: lix --silent download "https://github.com/kevinresol/coconut.data/archive/c925a927b00365a264b8c357ecfef102984b1800.tar.gz" into coconut.data/0.5.1/github/c925a927b00365a264b8c357ecfef102984b1800
+-D coconut.data=0.5.1
+-cp ${HAXESHIM_LIBCACHE}/coconut.data/0.5.1/github/c925a927b00365a264b8c357ecfef102984b1800/src
+
+-lib tink_state
+-lib tink_lang
+-lib tink_pure
