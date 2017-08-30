@@ -18,8 +18,9 @@ class PaginatedList<T> implements Model {
 			cache.get(page);
 		else {
 			var loaded = loader.getData(page, perPage);
+			var current = page; // page may be modified when loading
 			loaded.handle(function(o) switch o {
-				case Success(data): cache = cache.with(page, data);
+				case Success(data): cache = cache.with(current, data);
 				case Failure(_):
 			});
 			loaded;
