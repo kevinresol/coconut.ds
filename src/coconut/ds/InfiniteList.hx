@@ -33,4 +33,12 @@ class InfiniteList<T> implements Model {
 				},
 			});
 	}
+	
+	@:transition
+	function set(list:List<T>) {
+		return {
+			list: list,
+			last: list.last(),
+		}
+	}
 }
