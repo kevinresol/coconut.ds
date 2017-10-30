@@ -16,6 +16,7 @@
   "releasenote": "initial release",
   "version": "0.0.0",
   "dependencies": {
-    "coconut.data": ""
+    "coconut.data": "",
+    "tink_macro": ""
   }
 }
