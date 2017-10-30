@@ -67,8 +67,18 @@ class Macro {
 			var def = macro class $name implements coconut.data.Model {
 				@:constant var loader:Void->tink.core.Promise<$ct>;
 				@:constant var updater:coconut.ds.Optional<$ct>->tink.core.Promise<tink.core.Noise>;
-				public function refresh() return loader().next(set);
-				public function update(v:coconut.ds.Optional<$ct>) return updater(v).next(function(_) return setOptional(v));
+				
+				@:transition function refresh() 
+					return loader().next(function(v) {
+						set(v);
+						return tink.core.Noise.Noise.Noise;
+					}).swap({});
+				
+				@:transition function update(v:coconut.ds.Optional<$ct>)
+					return updater(v).next(function(_) {
+						setOptional(v);
+						return tink.core.Noise.Noise.Noise;
+					}).swap({});
 			}
 			
 			function add(c:TypeDefinition) def.fields = def.fields.concat(c.fields);
@@ -125,23 +135,18 @@ class Macro {
 			}
 			
 			add(macro class {
-				function set(v:$ct) {
+				public function set(v:$ct)
 					$b{setExprs};
-					return tink.core.Noise.Noise.Noise;
-				}
-				function setOptional(v:coconut.ds.Optional<$ct>) {
+					
+				public function setOptional(v:coconut.ds.Optional<$ct>)
 					$b{setOptionalExprs};
-					return tink.core.Noise.Noise.Noise;
-				}
+					
 				public function asObject():coconut.ds.ReadOnly<$ct>
 					return ${EObjectDecl(objFields).at()};
 			});
 			
 			def.pack = ['coconut', 'ds'];
-			trace(new haxe.macro.Printer().printTypeDefinition(def));
 			return def;
-			
-			
 		});
 	}
 }
