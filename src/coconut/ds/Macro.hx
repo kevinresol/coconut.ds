@@ -67,8 +67,8 @@ class Macro {
 			var def = macro class $name implements coconut.data.Model {
 				@:constant var loader:Void->tink.core.Promise<$ct>;
 				@:constant var updater:coconut.ds.Optional<$ct>->tink.core.Promise<tink.core.Noise>;
-				public function refresh() return loader().next(set);
-				public function update(v:coconut.ds.Optional<$ct>) return updater(v).next(function(_) return setOptional(v));
+				@:transition function refresh() return loader().next(set).swap({});
+				@:transition function update(v:coconut.ds.Optional<$ct>) return updater(v).next(function(_) return setOptional(v)).swap({});
 			}
 			
 			function add(c:TypeDefinition) def.fields = def.fields.concat(c.fields);
@@ -138,7 +138,6 @@ class Macro {
 			});
 			
 			def.pack = ['coconut', 'ds'];
-			trace(new haxe.macro.Printer().printTypeDefinition(def));
 			return def;
 			
 			

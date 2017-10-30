@@ -18,29 +18,37 @@ class EditableTest {
 	
 	public function flat() {
 		var editable = new FlatEditable({
-			loader: function() return Promise.lift(server.flat),
+			loader: function() return delay(function() return Promise.lift(server.flat)),
 			updater: function(v) {
-				switch v.name {
-					case Some(v): server.flat.name = v;
-					case _:
-				}
-				switch v.age {
-					case Some(v): server.flat.age = v;
-					case _:
-				}
-				return Noise;
+				return delay(function() {
+					switch v.name {
+						case Some(v): server.flat.name = v;
+						case _:
+					}
+					switch v.age {
+						case Some(v): server.flat.age = v;
+						case _:
+					}
+					return Noise;
+				});
 			}
 		});
 		
 		asserts.assert(editable.name == null);
 		asserts.assert(editable.age == null);
-		editable.refresh()
+		var refresh = editable.refresh();
+		asserts.assert(editable.isInTransition);
+		refresh
 			.next(function(o) {
+				asserts.assert(!editable.isInTransition);
 				asserts.assert(editable.name == server.flat.name);
 				asserts.assert(editable.age == server.flat.age);
-				return editable.update({name:Some('Chris Wong'), age:None});
+				var update = editable.update({name:Some('Chris Wong'), age:None});
+				asserts.assert(editable.isInTransition);
+				return update;
 			})
 			.next(function(o) {
+				asserts.assert(!editable.isInTransition);
 				asserts.assert(server.flat.name == 'Chris Wong');
 				asserts.assert(server.flat.age == 48);
 				asserts.assert(editable.name == server.flat.name);
@@ -53,44 +61,52 @@ class EditableTest {
 	
 	public function nested() {
 		var editable = new NestedEditable({
-			loader: function() return Promise.lift(server.nested),
+			loader: function() return delay(function() return Promise.lift(server.nested)),
 			updater: function(v) {
-				switch v.name {
-					case Some(v): server.nested.name = v;
-					case _:
-				}
-				switch v.age {
-					case Some(v): server.nested.age = v;
-					case _:
-				}
-				switch v.contact {
-					case Some(c):
-						switch c.phone {
-							case Some(v): server.nested.contact.phone = v;
-							case _:
-						}
-						switch c.email {
-							case Some(v): server.nested.contact.email = v;
-							case _:
-						}
-					case _:
-				}
-				return Noise;
+				return delay(function() {
+					switch v.name {
+						case Some(v): server.nested.name = v;
+						case _:
+					}
+					switch v.age {
+						case Some(v): server.nested.age = v;
+						case _:
+					}
+					switch v.contact {
+						case Some(c):
+							switch c.phone {
+								case Some(v): server.nested.contact.phone = v;
+								case _:
+							}
+							switch c.email {
+								case Some(v): server.nested.contact.email = v;
+								case _:
+							}
+						case _:
+					}
+					return Noise;
+				});
 			}
 		});
 		
 		asserts.assert(editable.name == null);
 		asserts.assert(editable.age == null);
 		asserts.assert(editable.contact == null);
-		editable.refresh()
+		var refresh = editable.refresh();
+		asserts.assert(editable.isInTransition);
+		refresh
 			.next(function(o) {
+				asserts.assert(!editable.isInTransition);
 				asserts.assert(editable.name == server.nested.name);
 				asserts.assert(editable.age == server.nested.age);
 				asserts.assert(editable.contact.phone == server.nested.contact.phone);
 				asserts.assert(editable.contact.email == server.nested.contact.email);
-				return editable.update({name:Some('Chris Wong'), age:None, contact:Some({phone:Some('123456789'), email:None})});
+				var update = editable.update({name:Some('Chris Wong'), age:None, contact:Some({phone:Some('123456789'), email:None})});
+				asserts.assert(editable.isInTransition);
+				return update;
 			})
 			.next(function(o) {
+				asserts.assert(!editable.isInTransition);
 				asserts.assert(server.nested.name == 'Chris Wong');
 				asserts.assert(server.nested.age == 48);
 				asserts.assert(server.nested.contact.phone == '123456789');
@@ -104,6 +120,9 @@ class EditableTest {
 			.handle(asserts.handle);
 		return asserts;
 	}
+	
+	function delay<T>(f:Void->Promise<T>, ms = 200)
+		return Future.async(function(cb) haxe.Timer.delay(function() f().handle(cb), ms));
 }
 
 typedef FlatData = {name:String, age:Int};
