@@ -22,17 +22,15 @@ class InfiniteList<T> implements Model {
 	}
 	
 	@:transition
-	function loadNext() {
-		if(isInTransition) return Promise.lift(new Error(Conflict, 'Already loading'));
-		return loader.load(last, perPage)
-			.next(function(loaded) return {
-				list: loader.concat(list, loaded),
-				last: switch loaded.last() {
-					case None: last;
-					case v: v;
-				},
-			});
+	function refresh() {
+		return loadAfter(None, true);
 	}
+	
+	@:transition
+	function loadNext() {
+		return loadAfter(last);
+	}
+	
 	
 	@:transition
 	function set(list:List<T>) {
@@ -40,5 +38,17 @@ class InfiniteList<T> implements Model {
 			list: list,
 			last: list.last(),
 		}
+	}
+	
+	function loadAfter(last, reset = false) {
+		if(isInTransition) return Promise.lift(new Error(Conflict, 'Already loading'));
+		return loader.load(last, perPage)
+			.next(function(loaded) return {
+				list: reset ? loaded : loader.concat(list, loaded),
+				last: switch loaded.last() {
+					case None: last;
+					case v: v;
+				},
+			});
 	}
 }
