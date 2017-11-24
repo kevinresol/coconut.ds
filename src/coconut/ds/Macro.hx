@@ -6,8 +6,8 @@ import tink.macro.BuildCache;
 using tink.MacroApi;
 
 class Macro {
-	public static function buildOptional() {
-		return BuildCache.getType('coconut.ds.Optional', function(ctx) {
+	public static function buildPatch() {
+		return BuildCache.getType('coconut.ds.Patch', function(ctx) {
 			var name = ctx.name;
 			var ct = ctx.type.toComplex();
 			var def = macro class $name {};
@@ -15,10 +15,10 @@ class Macro {
 			
 			switch ctx.type.reduce() {
 				case TAnonymous(_.get() => {fields: fields}):
-					for(field in fields) {
+					for(field in fields) if(field.meta.has(':patchable')) {
 						var fname = field.name;
 						var ct = field.type.toComplex();
-						if(field.type.reduce().match(TAnonymous(_))) ct = macro:coconut.ds.Optional<$ct>;
+						if(field.type.reduce().match(TAnonymous(_))) ct = macro:coconut.ds.Patch<$ct>;
 						add(macro class {
 							var $fname:haxe.ds.Option<$ct>;
 						});
@@ -40,15 +40,16 @@ class Macro {
 			var dataCt = ctx.type2.toComplex();
 			var def = macro class $name implements coconut.data.Model {
 				@:constant var id:$idCt;
-				@:observable var data:$dataCt = @byDefault null;
+				@:loaded var data:$dataCt = cache == null ? loader(id).next(function(data) {cache = data; return data;}) : cache;
+				@:editable private var cache:$dataCt = @byDefault null;
 				@:constant var loader:$idCt->tink.core.Promise<$dataCt>;
-				@:constant var updater:$idCt->coconut.ds.Optional<$dataCt>->tink.core.Promise<tink.core.Noise>;
+				@:constant var updater:$idCt->coconut.ds.Patch<$dataCt>->tink.core.Promise<tink.core.Noise>;
 				
-				@:transition function refresh() 
-					return loader(id).next(function(data) return {data: data});
+				public function refresh() 
+					return cache = null;
 					
-				@:transition function update(patch:coconut.ds.Optional<$dataCt>)
-					return updater(id, patch).next(function(_) return {data: new coconut.ds.Editable.Patcher<$dataCt>().patch(data, patch)});
+				@:transition function update(patch:coconut.ds.Patch<$dataCt>)
+					return updater(id, patch).next(function(_) return {cache: new coconut.ds.Editable.Patcher<$dataCt>().patch(cache, patch)});
 			}
 			def.pack = ['coconut', 'ds'];
 			return def;
@@ -64,7 +65,7 @@ class Macro {
 			
 			switch ctx.type.reduce() {
 				case TAnonymous(_.get() => {fields: fields}):
-					for(field in fields) {
+					for(field in fields) if(field.meta.has(':patchable')) {
 						var fname = field.name;
 						var ct = field.type.toComplex();
 						
@@ -89,7 +90,7 @@ class Macro {
 			
 			var def = macro class $name {
 				public function new() {}
-				public function patch(data:$ct, patch:coconut.ds.Optional<$ct>) $body;
+				public function patch(data:$ct, patch:coconut.ds.Patch<$ct>) $body;
 			}
 			
 			def.pack = ['coconut', 'ds'];
