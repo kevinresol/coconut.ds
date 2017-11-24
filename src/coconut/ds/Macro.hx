@@ -6,33 +6,6 @@ import tink.macro.BuildCache;
 using tink.MacroApi;
 
 class Macro {
-	public static function buildReadOnly() {
-		return BuildCache.getType('coconut.ds.ReadOnly', function(ctx) {
-			var name = ctx.name;
-			var ct = ctx.type.toComplex();
-			var def = macro class $name {};
-			function add(c:TypeDefinition) def.fields = def.fields.concat(c.fields);
-			
-			switch ctx.type.reduce() {
-				case TAnonymous(_.get() => {fields: fields}):
-					for(field in fields) {
-						var fname = field.name;
-						var ct = field.type.toComplex();
-						if(field.type.reduce().match(TAnonymous(_))) ct = macro:coconut.ds.ReadOnly<$ct>;
-						add(macro class {
-							var $fname(default, never):$ct;
-						});
-					}
-				default:
-					ctx.pos.error('Only supports anonymous structures');
-			}
-			
-			def.pack = ['coconut', 'ds'];
-			def.kind = TDStructure;
-			return def;
-		});
-	}
-	
 	public static function buildOptional() {
 		return BuildCache.getType('coconut.ds.Optional', function(ctx) {
 			var name = ctx.name;
