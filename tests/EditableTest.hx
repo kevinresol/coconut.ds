@@ -1,6 +1,7 @@
 package;
 
 import coconut.ds.*;
+import tink.anon.*;
 
 using tink.CoreApi;
 
@@ -18,8 +19,9 @@ class EditableTest {
 	
 	public function flat() {
 		var editable = new FlatEditable({
-			loader: function() return delay(function() return Promise.lift(server.flat)),
-			updater: function(v) {
+			id: '1',
+			loader: function(id) return delay(function() return Promise.lift(server.flat)),
+			updater: function(id, v) {
 				return delay(function() {
 					switch v.name {
 						case Some(v): server.flat.name = v;
@@ -34,15 +36,14 @@ class EditableTest {
 			}
 		});
 		
-		asserts.assert(editable.name == null);
-		asserts.assert(editable.age == null);
+		asserts.assert(editable.data == null);
 		var refresh = editable.refresh();
 		asserts.assert(editable.isInTransition);
 		refresh
 			.next(function(o) {
 				asserts.assert(!editable.isInTransition);
-				asserts.assert(editable.name == server.flat.name);
-				asserts.assert(editable.age == server.flat.age);
+				asserts.assert(editable.data.name == server.flat.name);
+				asserts.assert(editable.data.age == server.flat.age);
 				var update = editable.update({name:Some('Chris Wong'), age:None});
 				asserts.assert(editable.isInTransition);
 				return update;
@@ -51,8 +52,8 @@ class EditableTest {
 				asserts.assert(!editable.isInTransition);
 				asserts.assert(server.flat.name == 'Chris Wong');
 				asserts.assert(server.flat.age == 48);
-				asserts.assert(editable.name == server.flat.name);
-				asserts.assert(editable.age == server.flat.age);
+				asserts.assert(editable.data.name == server.flat.name);
+				asserts.assert(editable.data.age == server.flat.age);
 				return Noise;
 			})
 			.handle(asserts.handle);
@@ -61,8 +62,9 @@ class EditableTest {
 	
 	public function nested() {
 		var editable = new NestedEditable({
-			loader: function() return delay(function() return Promise.lift(server.nested)),
-			updater: function(v) {
+			id: '1',
+			loader: function(id) return delay(function() return Promise.lift(server.nested)),
+			updater: function(id, v) {
 				return delay(function() {
 					switch v.name {
 						case Some(v): server.nested.name = v;
@@ -89,18 +91,16 @@ class EditableTest {
 			}
 		});
 		
-		asserts.assert(editable.name == null);
-		asserts.assert(editable.age == null);
-		asserts.assert(editable.contact == null);
+		asserts.assert(editable.data == null);
 		var refresh = editable.refresh();
 		asserts.assert(editable.isInTransition);
 		refresh
 			.next(function(o) {
 				asserts.assert(!editable.isInTransition);
-				asserts.assert(editable.name == server.nested.name);
-				asserts.assert(editable.age == server.nested.age);
-				asserts.assert(editable.contact.phone == server.nested.contact.phone);
-				asserts.assert(editable.contact.email == server.nested.contact.email);
+				asserts.assert(editable.data.name == server.nested.name);
+				asserts.assert(editable.data.age == server.nested.age);
+				asserts.assert(editable.data.contact.phone == server.nested.contact.phone);
+				asserts.assert(editable.data.contact.email == server.nested.contact.email);
 				var update = editable.update({name:Some('Chris Wong'), age:None, contact:Some({phone:Some('123456789'), email:None})});
 				asserts.assert(editable.isInTransition);
 				return update;
@@ -111,10 +111,10 @@ class EditableTest {
 				asserts.assert(server.nested.age == 48);
 				asserts.assert(server.nested.contact.phone == '123456789');
 				asserts.assert(server.nested.contact.email == 'john@doe.com');
-				asserts.assert(editable.name == server.nested.name);
-				asserts.assert(editable.age == server.nested.age);
-				asserts.assert(editable.contact.phone == server.nested.contact.phone);
-				asserts.assert(editable.contact.email == server.nested.contact.email);
+				asserts.assert(editable.data.name == server.nested.name);
+				asserts.assert(editable.data.age == server.nested.age);
+				asserts.assert(editable.data.contact.phone == server.nested.contact.phone);
+				asserts.assert(editable.data.contact.email == server.nested.contact.email);
 				return Noise;
 			})
 			.handle(asserts.handle);
@@ -126,8 +126,8 @@ class EditableTest {
 }
 
 typedef FlatData = {name:String, age:Int};
-typedef FlatEditable = Editable<FlatData>;
+typedef FlatEditable = Editable<String, ReadOnly<FlatData>>;
 
 typedef NestedData = {name:String, age:Int, contact:{phone:String, email:String}};
-typedef NestedEditable = Editable<NestedData>;
+typedef NestedEditable = Editable<String, ReadOnly<NestedData>>;
 

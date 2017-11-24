@@ -34,89 +34,63 @@ class Macro {
 	}
 	
 	public static function buildEditable() {
-		return BuildCache.getType('coconut.ds.Editable', function(ctx) {
+		return BuildCache.getType2('coconut.ds.Editable', function(ctx) {
 			var name = ctx.name;
-			var ct = ctx.type.toComplex();
+			var idCt = ctx.type.toComplex();
+			var dataCt = ctx.type2.toComplex();
 			var def = macro class $name implements coconut.data.Model {
-				@:constant var loader:Void->tink.core.Promise<$ct>;
-				@:constant var updater:coconut.ds.Optional<$ct>->tink.core.Promise<tink.core.Noise>;
+				@:constant var id:$idCt;
+				@:observable var data:$dataCt = @byDefault null;
+				@:constant var loader:$idCt->tink.core.Promise<$dataCt>;
+				@:constant var updater:$idCt->coconut.ds.Optional<$dataCt>->tink.core.Promise<tink.core.Noise>;
 				
 				@:transition function refresh() 
-					return loader().next(function(v) {
-						set(v);
-						return tink.core.Noise.Noise.Noise;
-					}).swap({});
-				
-				@:transition function update(v:coconut.ds.Optional<$ct>)
-					return updater(v).next(function(_) {
-						setOptional(v);
-						return tink.core.Noise.Noise.Noise;
-					}).swap({});
+					return loader(id).next(function(data) return {data: data});
+					
+				@:transition function update(patch:coconut.ds.Optional<$dataCt>)
+					return updater(id, patch).next(function(_) return {data: new coconut.ds.Editable.Patcher<$dataCt>().patch(data, patch)});
 			}
+			def.pack = ['coconut', 'ds'];
+			return def;
+		});
+	}
+	
+	public static function buildPatcher() {
+		return BuildCache.getType('coconut.ds.Patcher', function(ctx) {
+			var name = ctx.name;
+			var ct = ctx.type.toComplex();
 			
-			function add(c:TypeDefinition) def.fields = def.fields.concat(c.fields);
-			
-			var setExprs = [];
-			var setOptionalExprs = [];
 			var objFields = [];
 			
 			switch ctx.type.reduce() {
 				case TAnonymous(_.get() => {fields: fields}):
 					for(field in fields) {
 						var fname = field.name;
-						var pname = '_$fname';
 						var ct = field.type.toComplex();
 						
-						switch field.type.reduce() {
-							case TAnonymous(_.get() => {fields: fields}):
-								var ct = field.type.toComplex();
-								var init = EObjectDecl([for(field in fields) {
-									var ffname = field.name;
-									{
-										field: '_$ffname',
-										expr: macro v.$fname.$ffname,
-									}
-								}].concat([{field: 'loader', expr: macro null}, {field: 'updater', expr: macro null}])).at(field.pos);
-								setExprs.push(macro $i{pname} = new coconut.ds.Editable<$ct>($init));
-								setOptionalExprs.push(macro switch v.$fname {
-									case Some(v): @:privateAccess $i{pname}.setOptional(v);
-									case None: // do nothing
-								});
-								objFields.push({field: fname, expr: macro $i{fname}});
-								add(macro class {
-									@:computed var $fname:coconut.ds.ReadOnly<$ct> = $i{pname} == null ? null : $i{pname}.asObject();
-									@:editable private var $pname:coconut.ds.Editable<$ct> = @byDefault null;
-								});
-							
-							default:
-								setExprs.push(macro $i{pname} = v.$fname);
-								setOptionalExprs.push(macro switch v.$fname {
-									case Some(v): $i{pname} = v;
-									case None: // do nothing
-								});
-								objFields.push({field: fname, expr: macro $i{fname}});
-								add(macro class {
-									@:computed var $fname:$ct = $i{pname};
-									@:editable private var $pname:$ct = @byDefault null;
-								});
-						}
-						
-						
+						objFields.push({
+							field: fname,
+							expr: macro switch patch.$fname {
+								case Some(v):
+									${switch field.type.reduce() {
+										case TAnonymous(_): macro new coconut.ds.Editable.Patcher<$ct>().patch(data.$fname, v);
+										case _: macro v;
+									}}
+								case None:
+									data.$fname;
+							}
+						});
 					}
 				default:
 					ctx.pos.error('Only supports anonymous structures');
 			}
 			
-			add(macro class {
-				public function set(v:$ct)
-					$b{setExprs};
-					
-				public function setOptional(v:coconut.ds.Optional<$ct>)
-					$b{setOptionalExprs};
-					
-				public function asObject():coconut.ds.ReadOnly<$ct>
-					return ${EObjectDecl(objFields).at()};
-			});
+			var body = macro return ${EObjectDecl(objFields).at()};
+			
+			var def = macro class $name {
+				public function new() {}
+				public function patch(data:$ct, patch:coconut.ds.Optional<$ct>) $body;
+			}
 			
 			def.pack = ['coconut', 'ds'];
 			return def;

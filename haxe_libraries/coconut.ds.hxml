@@ -1,3 +1,4 @@
 -cp src
 -lib coconut.data
 -lib tink_macro
+-lib tink_anon
