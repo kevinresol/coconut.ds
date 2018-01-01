@@ -7,7 +7,6 @@ class Cache<T> implements coconut.data.Model {
 	@:observable private var revision:Int = @byDefault 0;
 	@:observable private var cache:Option<T> = @byDefault None;
 	@:loaded var data:T = {
-		trace('load data');
 		revision;
 		switch cache {
 			case Some(v): v;
