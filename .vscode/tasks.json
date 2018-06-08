@@ -5,9 +5,9 @@
 	"tasks": [
 		{
 			"taskName": "Test",
-			"command": "haxelib",
+			"command": "travix",
 			"args": [
-				"run", "travix", "js"
+				"node"
 			],
 			"problemMatcher": [
 				"$haxe"
