@@ -4,18 +4,18 @@ import tink.pure.*;
 
 @:multiType(@:followWithAbstracts K)
 abstract Dict<K, V>(IDict<K, V>) {
-	public function new(initial:{factory:K->V});
+	public function new(factory:K->V);
 	public inline function get(k:K):V
 		return this.get(k);
 	
-	@:to static inline function toStringDict<K:String, V>(dict:IDict<K, V>, init):StringDict<V>
-		return new StringDict<V>(init);
+	@:to static inline function toStringDict<K:String, V>(dict:IDict<K, V>, f):StringDict<V>
+		return new StringDict<V>({factory: f});
 		
-	@:to static inline function toIntDict<K:Int, V>(dict:IDict<K, V>, init):IntDict<V>
-		return new IntDict<V>(init);
+	@:to static inline function toIntDict<K:Int, V>(dict:IDict<K, V>, f):IntDict<V>
+		return new IntDict<V>({factory: f});
 	
-	@:to static inline function toEnumValueDict<K:EnumValue, V>(dict:IDict<K, V>, init):EnumValueDict<K,V>
-		return new EnumValueDict<K,V>(init);
+	@:to static inline function toEnumValueDict<K:EnumValue, V>(dict:IDict<K, V>, f):EnumValueDict<K,V>
+		return new EnumValueDict<K,V>({factory: f});
 	
 	@:from static inline function fromStringDict<V>(dict:StringDict<V>):Dict<String, V>
 		return cast dict;

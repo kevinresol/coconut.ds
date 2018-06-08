@@ -8,13 +8,13 @@ class DictTest {
 	public function new() {}
 	
 	public function int() {
-		var dict = new Dict<Int, Object<Int>>({factory: function(i) return {id: i}});
+		var dict = new Dict<Int, Object<Int>>(function(i) return {id: i});
 		for(i in 0...5) asserts.assert(dict.get(i).id == i);
 		return asserts.done();
 	}
 	
 	public function string() {
-		var dict = new Dict<String, Object<String>>({factory: function(i) return {id: i}});
+		var dict = new Dict<String, Object<String>>(function(i) return {id: i});
 		for(i in 0...5) {
 			var s = '$i';
 			asserts.assert(dict.get(s).id == s);
@@ -23,7 +23,7 @@ class DictTest {
 	}
 	
 	public function enumValue() {
-		var dict = new Dict<EnumValue, Object<EnumValue>>({factory: function(i) return {id: i}});
+		var dict = new Dict<EnumValue, Object<EnumValue>>(function(i) return {id: i});
 		for(i in 0...5) {
 			var s = A(i);
 			asserts.assert(compare(A(i), dict.get(s).id));
