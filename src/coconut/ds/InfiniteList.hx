@@ -9,7 +9,7 @@ class InfiniteList<T> implements Model {
 	@:constant var concat:List<T>->List<T>->List<T>; // existing->loaded->result
 	@:constant var load:Option<T>->Int->Promise<List<T>>; // after->count->result
 	
-	@:constant var cache:Cache<List<T>> = @byDefault new MemoryCache();
+	@:constant var cache:Cache<List<T>> = @byDefault new NoCache();
 	@:editable private var cached:List<T> = null;
 	@:editable private var loaded:Option<List<T>> = None;
 	
@@ -22,7 +22,7 @@ class InfiniteList<T> implements Model {
 	}
 	
 	public function init() {
-		cache.get().handle(function(v) cached = v);
+		cache.get().handle(function(v) cached = v.orNull());
 		return refresh();
 	}
 	

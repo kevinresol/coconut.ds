@@ -35,7 +35,9 @@ class ReactNativeCache {
 			
 			var def = macro class $name extends coconut.ds.cache.ReactNativeCache.ReactNativeCacheBase implements coconut.ds.cache.Cache<$ct> {
 				public function get()
-					return getItem().next(v -> tink.Json.parse((v:$ct))).recover(_ -> null);
+					return getItem().next(v -> tink.Json.parse((v:$ct)))
+						.next(haxe.ds.Option.Some)
+						.recover(_ -> haxe.ds.Option.None);
 				
 				public function set(v:$ct)
 					return setItem(tink.Json.stringify(v)).recover(_ -> Noise);
