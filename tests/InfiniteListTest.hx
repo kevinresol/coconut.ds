@@ -19,6 +19,12 @@ class InfiniteListTest {
 		
 		seq([
 			lazy(
+				function() return list.list,
+				function(list) {
+					asserts.assert(list == null);
+				}
+			),
+			lazy(
 				function() return list.init()
 			),
 			lazy(
