@@ -4,7 +4,16 @@ import coconut.ds.cache.*;
 import coconut.data.*;
 using tink.CoreApi;
 
-class InfiniteList<T> implements Model {
+@:forward
+abstract InfiniteList<T>(InfiniteListImpl<T>) from InfiniteListImpl<T> to InfiniteListImpl<T> {
+	public function new(init) {
+		this = new InfiniteListImpl<T>(init);
+		this.init();
+	}
+}
+
+@:allow(coconut.ds.InfiniteList)
+private class InfiniteListImpl<T> implements Model {
 	@:constant var perPage:Int;
 	@:constant var concat:List<T>->List<T>->List<T>; // existing->loaded->result
 	@:constant var load:Option<T>->Int->Promise<List<T>>; // after->count->result
@@ -21,7 +30,7 @@ class InfiniteList<T> implements Model {
 		loaded = None;
 	}
 	
-	public function init() {
+	function init() {
 		cache.get().handle(function(v) cached = v.orNull());
 		return refresh();
 	}
