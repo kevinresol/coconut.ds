@@ -45,7 +45,7 @@ class InfiniteList<T> implements Model {
 					case Some(list) if(!reset): concat(list, v);
 					case _: v;
 				};
-				cache.set(updated);
+				cache.set(updated).eager();
 				loaded = Some(updated);
 				return Noise;
 			});
