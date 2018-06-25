@@ -1,5 +1,6 @@
 package coconut.ds;
 
+import coconut.ds.cache.*;
 import coconut.data.*;
 using tink.CoreApi;
 
@@ -49,26 +50,4 @@ class InfiniteList<T> implements Model {
 				return Noise;
 			});
 	}
-}
-
-@:pure
-class MemoryCache<T> implements Cache<T> {
-	var value:T;
-	
-	public function new() {}
-	
-	public function get():Future<T> {
-		return Future.sync(value);
-	}
-	
-	public function set(v:T):Future<Noise> {
-		value = v;
-		return Future.sync(Noise);
-	}
-}
-
-@:pure
-interface Cache<T> {
-	function get():Future<T>;
-	function set(v:T):Future<Noise>;
 }
