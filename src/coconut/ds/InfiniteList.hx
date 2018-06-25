@@ -8,8 +8,8 @@ class InfiniteList<T> implements Model {
 	@:constant var perPage:Int;
 	@:constant var concat:List<T>->List<T>->List<T>; // existing->loaded->result
 	@:constant var load:Option<T>->Int->Promise<List<T>>; // after->count->result
-	
 	@:constant var cache:Cache<List<T>> = @byDefault new NoCache();
+	
 	@:editable private var cached:List<T> = null;
 	@:editable private var loaded:Option<List<T>> = None;
 	

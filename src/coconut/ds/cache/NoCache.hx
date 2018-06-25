@@ -2,7 +2,15 @@ package coconut.ds.cache;
 
 using tink.CoreApi;
 
-class NoCache<T> implements Cache<T> {
+@:forward
+abstract NoCache<T>(NoCacheBase<T>) to Cache<T> {
+	static var inst:NoCacheBase<Dynamic> = new NoCacheBase();
+	
+	public function new()
+		this = cast inst;
+}
+
+private class NoCacheBase<T> implements Cache<T> {
 	public function new() {}
 	
 	public function get():Future<Option<T>> {
