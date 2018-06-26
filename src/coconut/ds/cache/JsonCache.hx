@@ -21,15 +21,15 @@ using tink.MacroApi;
 
 class JsonCache {
 	public static function build() {
-		return BuildCache.getType('coconut.ds.cache.JsonCache', ctx -> {
+		return BuildCache.getType('coconut.ds.cache.JsonCache', function(ctx) {
 			var name = ctx.name;
 			var ct = ctx.type.toComplex();
 			
 			var def = macro class $name extends coconut.ds.cache.JsonCache.JsonCacheBase<$ct> implements coconut.ds.cache.Cache<$ct> {
 				public function get()
-					return storage.get().next(v -> tink.Json.parse((tink.core.Option.OptionTools.orNull(v):$ct)))
+					return storage.get().next(function(v) return tink.Json.parse((tink.core.Option.OptionTools.orNull(v):$ct)))
 						.next(haxe.ds.Option.Some)
-						.recover(_ -> haxe.ds.Option.None);
+						.recover(function(_) return haxe.ds.Option.None);
 				
 				public function set(v:$ct)
 					return storage.set(tink.Json.stringify(v));
