@@ -19,6 +19,7 @@ private class InfiniteListImpl<T> implements Model {
 	@:constant var concat:List<T>->List<T>->List<T>; // existing->loaded->result
 	@:constant var load:Option<T>->Int->Promise<List<T>>; // after->count->result
 	@:constant var cache:Cache<List<T>> = @byDefault new NoCache();
+	@:constant var onCacheLoaded:List<T>->Void = @byDefault null;
 	
 	@:editable private var cached:List<T> = null;
 	@:observable private var loaded:Option<List<T>> = None;
@@ -36,7 +37,10 @@ private class InfiniteListImpl<T> implements Model {
 	
 	@:transition
 	function init() {
-		cache.get().handle(function(v) cached = v.orNull());
+		cache.get().handle(function(v) {
+			cached = v.orNull();
+			if(onCacheLoaded != null) onCacheLoaded(cached);
+		});
 		return loadAfter(None, true);
 	}
 	
