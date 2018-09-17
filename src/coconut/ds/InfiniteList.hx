@@ -69,6 +69,7 @@ private class InfiniteListImpl<T> implements Model {
 					case Some(list) if(!reset): concat(list, v);
 					case _: v;
 				};
+				cached = updated;
 				cache.set(updated).eager();
 				return {
 					loaded: Some(updated),
