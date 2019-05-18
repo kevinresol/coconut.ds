@@ -7,25 +7,22 @@ import tink.unit.Helper.*;
 using tink.CoreApi;
 
 @:asserts
-class InfiniteListTest {
-	public function new() {}
+class InfiniteListTest extends Base {
 	
 	public function test() {
 		var list = new InfiniteList({
 			perPage: 10,
 			concat: function(current, loaded) return current.concat(loaded),
-			load: function(after, count) return get(after.orNull(), count)
+			load: function(after, count) return delay(function() return get(after.orNull(), count))
 		});
 		
 		seq([
 			lazy(
 				function() return list.list,
-				function(list) {
-					asserts.assert(list == null);
-				}
+				function(list) asserts.assert(list == null)
 			),
 			lazy(
-				function() return list.init()
+				function() return Future.delay(250, Noise)
 			),
 			lazy(
 				function() return list.list,
@@ -62,7 +59,7 @@ class InfiniteListTest {
 		return asserts;
 	}
 	
-	function get(after:Int, count:Int):Promise<List<Int>> {
+	function get(after:Null<Int>, count:Int):Promise<List<Int>> {
 		
 		var start = after == null ? 0 : after + 1;
 		return List.fromArray([for(i in start...start+count) i]);

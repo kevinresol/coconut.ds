@@ -5,8 +5,10 @@
 	"tasks": [
 		{
 			"taskName": "Test",
-			"command": "travix",
+			"command": "lix",
 			"args": [
+				"run",
+				"travix",
 				"node"
 			],
 			"problemMatcher": [

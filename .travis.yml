@@ -1,23 +1,34 @@
 sudo: required
-dist: trusty
+dist: xenial
 
-language: haxe
+language: node_js
+node_js: 8
+
+cache:
+  directories:
+    - $HOME/haxe
 
 os:
   - linux
-  - osx
-  
-haxe:
-  - "3.4.0"
-  - development
-  
-matrix:
-  allow_failures:
-    - haxe: development
-    
-install:
-  - haxelib install travix
-  - haxelib run travix install
+  # - osx
 
+env:
+  - HAXE_VERSION=3.4.7
+  - HAXE_VERSION=nightly
+  
+install:
+  - npm i -g lix
+  - lix install haxe $HAXE_VERSION
+  - lix download
+  
 script:
-  - haxelib run travix js
+  - lix run travix interp
+  - lix run travix neko
+  # - lix run travix python
+  - lix run travix node
+  # - lix run travix flash
+  # - lix run travix java
+  # - lix run travix cs
+  - lix run travix js
+  - lix run travix cpp
+  - lix run travix php

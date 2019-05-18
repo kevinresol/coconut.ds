@@ -7,7 +7,8 @@ class RunTests {
 
   static function main() {
     Runner.run(TestBatch.make([
-      // new EditableTest(),
+      new UpdatableTest(),
+      new CollectionTest(),
       new InfiniteListTest(),
       new DictTest(),
     ])).handle(Runner.exit);

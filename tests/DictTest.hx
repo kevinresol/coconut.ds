@@ -4,8 +4,7 @@ import coconut.ds.Dict;
 import deepequal.DeepEqual.*;
 
 @:asserts
-class DictTest {
-	public function new() {}
+class DictTest extends Base {
 	
 	public function int() {
 		var dict = new Dict<Int, Object<Int>>(function(i) return {id: i});

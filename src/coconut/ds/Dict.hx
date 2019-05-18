@@ -22,6 +22,9 @@ abstract Dict<K, V>(IDict<K, V>) {
 		
 	@:from static inline function fromIntDict<V>(dict:IntDict<V>):Dict<Int, V>
 		return cast dict;
+		
+	@:from static inline function fromEnumValueDict<K:EnumValue, V>(dict:EnumValueDict<K, V>):Dict<K, V>
+		return cast dict;
 }
 
 interface IDict<K, V> {

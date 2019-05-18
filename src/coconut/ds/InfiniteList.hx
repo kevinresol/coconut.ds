@@ -56,6 +56,7 @@ private class InfiniteListImpl<T> implements Model {
 	
 	@:transition
 	function set(v) {
+		trace('set');
 		return {
 			loaded: Some(v),
 		}
