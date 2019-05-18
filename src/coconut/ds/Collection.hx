@@ -38,8 +38,8 @@ abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) {
 	@:to inline function toStringCollection<K:String, Data, Item>(init):StringCollection<Data, Item>
 		return new StringCollection<Data, Item>(init);
 	
-	@:to inline function toEnumCollection<K:EnumValue, Data, Item>(init):EnumCollection<Data, Item>
-		return new EnumCollection<Data, Item>(init);
+	@:to inline function toEnumValueCollection<K:EnumValue, Data, Item>(init):EnumValueCollection<Data, Item>
+		return new EnumValueCollection<Data, Item>(init);
 	
 	@:from static inline function fromIntCollection<Data, Item>(collection:IntCollection<Data, Item>):Collection<Int, Data, Item>
 		return cast collection;
@@ -47,7 +47,7 @@ abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) {
 	@:from static inline function fromStringCollection<Data, Item>(collection:StringCollection<Data, Item>):Collection<String, Data, Item>
 		return cast collection;
 	
-	@:from static inline function fromEnumCollection<Data, Item>(collection:EnumCollection<Data, Item>):Collection<EnumValue, Data, Item>
+	@:from static inline function fromEnumValueCollection<Data, Item>(collection:EnumValueCollection<Data, Item>):Collection<EnumValue, Data, Item>
 		return cast collection;
 }
 
@@ -98,7 +98,7 @@ class StringCollection<Data, Item> implements coconut.data.Model {
 	public function refresh() revision++;
 }
 
-class EnumCollection<Data, Item> implements coconut.data.Model {
+class EnumValueCollection<Data, Item> implements coconut.data.Model {
 	@:editable private var revision:Int = 0;
 	@:constant var fetch:Void->Promise<List<Data>>;
 	@:constant var createItem:EnumValue->Data->Item;
