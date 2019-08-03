@@ -11,6 +11,7 @@ typedef Init<Key, Data, Item> = {
 	extractKey:Data->Key,
 	createItem:Key->Data->Item,
 	updateItem:Item->Data->Void,
+	?cache:Option<List<Item>>,
 }
 
 @:multiType(@:followWithAbstracts K)
@@ -54,7 +55,7 @@ abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) from ICollection<
 interface ICollection<K, Data, Item> {
 	var list(get, never):Promised<List<Item>>;
 	var map(get, never):Dict<K, Item>;
-	function refresh():Void;
+	function refresh(?cache:Option<List<Item>> = @byDefault None):Void;
 }
 
 class IntCollection<Data, Item> implements coconut.data.Model implements ICollection<Int, Data, Item> {
@@ -63,18 +64,26 @@ class IntCollection<Data, Item> implements coconut.data.Model implements ICollec
 	@:constant var createItem:Int->Data->Item;
 	@:constant var updateItem:Item->Data->Void;
 	@:constant var extractKey:Data->Int;
-	
+	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;
-		fetch().next(function(list) return list.map(function(data) {
-			var item = map.get(extractKey(data));
-			updateItem(item, data);
-			return item;
-		}));
+		switch cache {
+			case None:
+				fetch().next(function(list) return list.map(function(data) {
+					var item = map.get(extractKey(data));
+					updateItem(item, data);
+					return item;
+				}));
+			case Some(v):
+				v;
+		}
 	}
 	@:constant var map:Dict<Int, Item> = new Dict(createItem.bind(_, null));
 	
-	public function refresh() revision++;
+	public function refresh(cache = None) {
+		this.cache = cache;
+		revision++;
+	}
 }
 
 class StringCollection<Data, Item> implements coconut.data.Model implements ICollection<String, Data, Item> {
@@ -83,18 +92,26 @@ class StringCollection<Data, Item> implements coconut.data.Model implements ICol
 	@:constant var createItem:String->Data->Item;
 	@:constant var updateItem:Item->Data->Void;
 	@:constant var extractKey:Data->String;
-	
+	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;
-		fetch().next(function(list) return list.map(function(data) {
-			var item = map.get(extractKey(data));
-			updateItem(item, data);
-			return item;
-		}));
+		switch cache {
+			case None:
+				fetch().next(function(list) return list.map(function(data) {
+					var item = map.get(extractKey(data));
+					updateItem(item, data);
+					return item;
+				}));
+			case Some(v):
+				v;
+		}
 	}
 	@:constant var map:Dict<String, Item> = new Dict(createItem.bind(_, null));
 	
-	public function refresh() revision++;
+	public function refresh(cache = None) {
+		this.cache = cache;
+		revision++;
+	}
 }
 
 class EnumValueCollection<Data, Item> implements coconut.data.Model implements ICollection<EnumValue, Data, Item> {
@@ -103,16 +120,24 @@ class EnumValueCollection<Data, Item> implements coconut.data.Model implements I
 	@:constant var createItem:EnumValue->Data->Item;
 	@:constant var updateItem:Item->Data->Void;
 	@:constant var extractKey:Data->EnumValue;
-	
+	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;
-		fetch().next(function(list) return list.map(function(data) {
-			var item = map.get(extractKey(data));
-			updateItem(item, data);
-			return item;
-		}));
+		switch cache {
+			case None:
+				fetch().next(function(list) return list.map(function(data) {
+					var item = map.get(extractKey(data));
+					updateItem(item, data);
+					return item;
+				}));
+			case Some(v):
+				v;
+		}
 	}
 	@:constant var map:Dict<EnumValue, Item> = new Dict(createItem.bind(_, null));
 	
-	public function refresh() revision++;
+	public function refresh(cache = None) {
+		this.cache = cache;
+		revision++;
+	}
 }

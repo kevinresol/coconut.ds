@@ -22,7 +22,7 @@ class CollectionTest extends Base {
 			extractKey: function(data:Data):Int return data.id,
 			createItem: function(id:Int, data:Data):Model {
 				return new Model({
-					cache: data,
+					cache: Some(data),
 					loader: function() return delay(function() return server.find(function(item) return item.id == id)),
 					updater: function(_, v) {
 						server = server.filter(function(item) return item.id != v.id).concat([v]);
@@ -30,7 +30,7 @@ class CollectionTest extends Base {
 					}
 				});
 			},
-			updateItem: function(model:Model, data:Data) model.refresh(data),
+			updateItem: function(model:Model, data:Data) model.refresh(Some(data)),
 		});
 		
 		asserts.assert(collection.list == Loading);
