@@ -20,9 +20,9 @@ class CollectionTest extends Base {
 		var collection = new Collection<Int, Data, Model>({
 			fetch: function():Promise<List<Data>> return delay(function() return List.fromArray(server)),
 			extractKey: function(data:Data):Int return data.id,
-			createItem: function(id:Int, data:Data):Model {
+			createItem: function(id:Int, data:Option<Data>):Model {
 				return new Model({
-					cache: Some(data),
+					cache: data,
 					loader: function() return delay(function() return server.find(function(item) return item.id == id)),
 					updater: function(_, v) {
 						server = server.filter(function(item) return item.id != v.id).concat([v]);
