@@ -24,7 +24,7 @@ class CollectionTest extends Base {
 				return new Model({
 					cache: data,
 					loader: function() return delay(function() return server.find(function(item) return item.id == id)),
-					updater: function(v) {
+					updater: function(_, v) {
 						server = server.filter(function(item) return item.id != v.id).concat([v]);
 						return v;
 					}

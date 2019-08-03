@@ -16,7 +16,7 @@ class Updatable<Content, Patch> implements coconut.data.Model {
 	}
 	
 	public function update(patch) {
-		var ret = observables.data.getNext(v -> v.toOption()).next(updater.bind(_, patch));
+		var ret = observables.data.getNext(function(v) return v.toOption()).next(updater.bind(_, patch));
 		ret.handle(function(o) switch o {
 			case Success(v): refresh(v);
 			case Failure(e): // skip

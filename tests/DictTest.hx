@@ -26,6 +26,13 @@ class DictTest extends Base {
 		asserts.assert(compare(A(3), dict.get(A(2), function(i) return {id: switch i {case A(v): A(v+1);}}).id));
 		return asserts.done();
 	}
+	
+	public function wrapped() {
+		var container = new Container();
+		asserts.assert(container.dict.get(1).id == 1);
+		asserts.assert(container.dict.get(2, function(i) return {id: i + 1}).id == 3);
+		return asserts.done();
+	}
 }
 
 
@@ -35,4 +42,8 @@ private typedef Object<T> = {
 
 private enum E {
 	A(i:Int);
+}
+
+private class Container implements coconut.data.Model {
+	@:constant var dict:Dict<Int, Object<Int>> = new Dict<Int, Object<Int>>(function(i) return {id: i});
 }

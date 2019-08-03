@@ -13,7 +13,7 @@ class UpdatableTest extends Base {
 	public function test() {
 		var model = new Model({
 			loader: function() return delay(function() return Promise.lift(data)),
-			updater: function(v) return delay(function() return data = v),
+			updater: function(_, v) return delay(function() return data = v),
 		});
 		
 		asserts.assert(model.data == Loading);
