@@ -1,7 +1,9 @@
 package coconut.ds;
 
 import tink.pure.List;
+import tink.state.Observable;
 import tink.state.Promised;
+import coconut.data.ObservablesOf;
 import coconut.ds.Dict;
 
 using tink.CoreApi;
@@ -14,21 +16,15 @@ typedef Init<Key, Data, Item> = {
 	?cache:Option<List<Item>>,
 }
 
+@:forward
 @:multiType(@:followWithAbstracts K)
 abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) from ICollection<K, Data, Item> {
-	public var list(get, never):Promised<List<Item>>;
-	public var map(get, never):Dict<K, Item>;
+	public var observables(get, never):ObservablesOfCollection<K, Data, Item>;
 	
 	public function new(init:Init<K, Data, Item>);
-	
-	inline function get_list()
-		return this.list;
 		
-	inline function get_map()
-		return this.map;
-		
-	public inline function refresh(?v)
-		this.refresh(v);
+	public inline function get_observables():ObservablesOfCollection<K, Data, Item>
+		return this.observables;
 		
 	public inline function get(key:K):Item
 		return this.map.get(key);
@@ -55,7 +51,18 @@ abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) from ICollection<
 interface ICollection<K, Data, Item> {
 	var list(get, never):Promised<List<Item>>;
 	var map(get, never):Dict<K, Item>;
+	var observables(default, never):ObservablesOfCollection<K, Data, Item>;
 	function refresh(?cache:Option<List<Item>>):Void;
+}
+
+typedef ObservablesOfCollection<K, Data, Item> = {
+	var updateItem(default, never):Observable<Item->Data->Void>;
+	var map(default, never):Observable<Dict<K, Item>>;
+	var list(default, never):Observable<Promised<List<Item>>>;
+	var isInTransition(default, never):Observable<Bool>;
+	var fetch(default, never):Observable<Void->Promise<List<Data>>>;
+	var extractKey(default, never):Observable<Data->K>;
+	var createItem(default, never):Observable<K->Option<Data>->Item>;
 }
 
 class IntCollection<Data, Item> implements coconut.data.Model implements ICollection<Int, Data, Item> {
