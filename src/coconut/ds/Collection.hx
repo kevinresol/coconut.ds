@@ -8,69 +8,78 @@ import coconut.ds.Dict;
 
 using tink.CoreApi;
 
-typedef Init<Key, Data, Item> = {
-	fetch:Void->Promise<List<Data>>,
-	extractKey:Data->Key,
-	createItem:Key->Option<Data>->Item,
-	updateItem:Item->Data->Void,
+typedef Init<Key, RawData, Item> = {
+	fetch:Void->Promise<List<RawData>>,
+	extractKey:RawData->Key,
+	createItem:Key->Option<RawData>->Item,
+	updateItem:Item->RawData->Void,
 	?cache:Option<List<Item>>,
 }
 
 @:forward
 @:multiType(@:followWithAbstracts K)
-abstract Collection<K, Data, Item>(ICollection<K, Data, Item>) from ICollection<K, Data, Item> {
-	public var observables(get, never):ObservablesOfCollection<K, Data, Item>;
+abstract Collection<K, RawData, Item>(ICollection<K, RawData, Item>) from ICollection<K, RawData, Item> {
+	public var observables(get, never):ObservablesOfCollection<K, RawData, Item>;
 	
-	public function new(init:Init<K, Data, Item>);
+	public function new(init:Init<K, RawData, Item>);
 		
-	public inline function get_observables():ObservablesOfCollection<K, Data, Item>
+	public inline function get_observables():ObservablesOfCollection<K, RawData, Item>
 		return this.observables;
 		
 	public inline function get(key:K):Item
 		return this.map.get(key);
 	
-	@:to inline function toIntCollection<K:Int, Data, Item>(init):IntCollection<Data, Item>
-		return new IntCollection<Data, Item>(init);
+	public inline function sub(fetch:Void->Promise<List<RawData>>):SubCollection<K, RawData, Item> {
+		return new SubCollection({
+			fetch: fetch,
+			parent: this,
+		});
+	}
 	
-	@:to inline function toStringCollection<K:String, Data, Item>(init):StringCollection<Data, Item>
-		return new StringCollection<Data, Item>(init);
+	@:to inline function toIntCollection<K:Int, RawData, Item>(init):IntCollection<RawData, Item>
+		return new IntCollection<RawData, Item>(init);
 	
-	@:to inline function toEnumValueCollection<K:EnumValue, Data, Item>(init):EnumValueCollection<Data, Item>
-		return new EnumValueCollection<Data, Item>(init);
+	@:to inline function toStringCollection<K:String, RawData, Item>(init):StringCollection<RawData, Item>
+		return new StringCollection<RawData, Item>(init);
 	
-	@:from static inline function fromIntCollection<Data, Item>(collection:IntCollection<Data, Item>):Collection<Int, Data, Item>
+	@:to inline function toEnumValueCollection<K:EnumValue, RawData, Item>(init):EnumValueCollection<RawData, Item>
+		return new EnumValueCollection<RawData, Item>(init);
+	
+	@:from static inline function fromIntCollection<RawData, Item>(collection:IntCollection<RawData, Item>):Collection<Int, RawData, Item>
 		return collection;
 	
-	@:from static inline function fromStringCollection<Data, Item>(collection:StringCollection<Data, Item>):Collection<String, Data, Item>
+	@:from static inline function fromStringCollection<RawData, Item>(collection:StringCollection<RawData, Item>):Collection<String, RawData, Item>
 		return collection;
 	
-	@:from static inline function fromEnumValueCollection<Data, Item>(collection:EnumValueCollection<Data, Item>):Collection<EnumValue, Data, Item>
+	@:from static inline function fromEnumValueCollection<RawData, Item>(collection:EnumValueCollection<RawData, Item>):Collection<EnumValue, RawData, Item>
 		return collection;
 }
 
-interface ICollection<K, Data, Item> {
+interface ICollection<K, RawData, Item> {
 	var list(get, never):Promised<List<Item>>;
 	var map(get, never):Dict<K, Item>;
-	var observables(default, never):ObservablesOfCollection<K, Data, Item>;
+	var observables(default, never):ObservablesOfCollection<K, RawData, Item>;
+	var updateItem(get, never):Item->RawData->Void;
+	var extractKey(get, never):RawData->K;
 	function refresh(?cache:Option<List<Item>>):Void;
 }
 
-typedef ObservablesOfCollection<K, Data, Item> = {
-	var updateItem(default, never):Observable<Item->Data->Void>;
+typedef ObservablesOfCollection<K, RawData, Item> = {
+	var updateItem(default, never):Observable<Item->RawData->Void>;
 	var map(default, never):Observable<Dict<K, Item>>;
 	var list(default, never):Observable<Promised<List<Item>>>;
 	var isInTransition(default, never):Observable<Bool>;
-	var fetch(default, never):Observable<Void->Promise<List<Data>>>;
-	var extractKey(default, never):Observable<Data->K>;
-	var createItem(default, never):Observable<K->Option<Data>->Item>;
+	var fetch(default, never):Observable<Void->Promise<List<RawData>>>;
+	var extractKey(default, never):Observable<RawData->K>;
+	var createItem(default, never):Observable<K->Option<RawData>->Item>;
 }
 
-class IntCollection<Data, Item> implements coconut.data.Model implements ICollection<Int, Data, Item> {
+class IntCollection<RawData, Item> implements coconut.data.Model implements ICollection<Int, RawData, Item> {
 	@:editable private var revision:Int = 0;
-	@:constant var fetch:Void->Promise<List<Data>>;
-	@:constant var createItem:Int->Option<Data>->Item;
-	@:constant var updateItem:Item->Data->Void;
-	@:constant var extractKey:Data->Int;
+	@:constant var fetch:Void->Promise<List<RawData>>;
+	@:constant var createItem:Int->Option<RawData>->Item;
+	@:constant var updateItem:Item->RawData->Void;
+	@:constant var extractKey:RawData->Int;
 	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;
@@ -93,12 +102,12 @@ class IntCollection<Data, Item> implements coconut.data.Model implements ICollec
 	}
 }
 
-class StringCollection<Data, Item> implements coconut.data.Model implements ICollection<String, Data, Item> {
+class StringCollection<RawData, Item> implements coconut.data.Model implements ICollection<String, RawData, Item> {
 	@:editable private var revision:Int = 0;
-	@:constant var fetch:Void->Promise<List<Data>>;
-	@:constant var createItem:String->Option<Data>->Item;
-	@:constant var updateItem:Item->Data->Void;
-	@:constant var extractKey:Data->String;
+	@:constant var fetch:Void->Promise<List<RawData>>;
+	@:constant var createItem:String->Option<RawData>->Item;
+	@:constant var updateItem:Item->RawData->Void;
+	@:constant var extractKey:RawData->String;
 	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;
@@ -121,12 +130,12 @@ class StringCollection<Data, Item> implements coconut.data.Model implements ICol
 	}
 }
 
-class EnumValueCollection<Data, Item> implements coconut.data.Model implements ICollection<EnumValue, Data, Item> {
+class EnumValueCollection<RawData, Item> implements coconut.data.Model implements ICollection<EnumValue, RawData, Item> {
 	@:editable private var revision:Int = 0;
-	@:constant var fetch:Void->Promise<List<Data>>;
-	@:constant var createItem:EnumValue->Option<Data>->Item;
-	@:constant var updateItem:Item->Data->Void;
-	@:constant var extractKey:Data->EnumValue;
+	@:constant var fetch:Void->Promise<List<RawData>>;
+	@:constant var createItem:EnumValue->Option<RawData>->Item;
+	@:constant var updateItem:Item->RawData->Void;
+	@:constant var extractKey:RawData->EnumValue;
 	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	@:loaded var list:List<Item> = {
 		revision;

@@ -33,15 +33,20 @@ class CollectionTest extends Base {
 			updateItem: function(model:Model, data:Data) model.refresh(Some(data)),
 		});
 		
+		var sub = collection.sub(function():Promise<List<Data>> return delay(function() return List.fromArray(server.filter(function(v) return v.id == 1))));
+		
 		asserts.assert(collection.list == Loading);
+		asserts.assert(sub.list == Loading);
 		Future.delay(250, Noise)
 			.next(function(_) {
-				switch collection.list {
-					case Done(items): 
+				switch [collection.list, sub.list] {
+					case [Done(items), Done(subitems)]: 
 						asserts.assert(items.length == 2);
-					case Failed(e):
+						asserts.assert(subitems.length == 1);
+						asserts.assert(sub.get(1) == collection.get(1), 'SubCollection gets the same reference as in its parent Collection');
+					case [Failed(e), _] | [_, Failed(e)]:
 						asserts.fail(e);
-					case Loading:
+					case _:
 						asserts.fail(new Error('Expected Done'));
 				}
 				return Noise;
@@ -53,3 +58,4 @@ class CollectionTest extends Base {
 
 private typedef Data = ReadOnly<{id:Int, value:String}>;
 private typedef Model = Updatable<Data, Data>;
+
