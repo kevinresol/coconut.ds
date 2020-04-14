@@ -71,7 +71,7 @@ typedef ObservablesOfCollection<K, RawData, Item> = {
 	var isInTransition(default, never):Observable<Bool>;
 	var fetch(default, never):Observable<Void->Promise<List<RawData>>>;
 	var extractKey(default, never):Observable<RawData->K>;
-	var createItem(default, never):Observable<K->Option<RawData>->Item>;
+	// var createItem(default, never):Observable<K->Option<RawData>->Item>;
 }
 
 class IntCollection<RawData, Item> implements coconut.data.Model implements ICollection<Int, RawData, Item> {

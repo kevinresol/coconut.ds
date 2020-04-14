@@ -17,11 +17,16 @@ using tink.CoreApi;
  * postsWithTagX.get(id) == allPosts.get(id); // true, same instance
  * ```
  */
-class SubCollection<Key, RawData, Item> implements coconut.data.Model {
+class SubCollection<Key, RawData, Item> implements coconut.data.Model implements coconut.ds.Collection.ICollection<Key, RawData, Item> {
 	@:editable private var revision:Int = 0;
 	@:constant var fetch:Void->Promise<List<RawData>>;
 	@:constant var parent:Collection<Key, RawData, Item>;
 	@:editable private var cache:Option<List<Item>> = @byDefault None;
+	
+	// forwards
+	@:constant var map:Dict<Key, Item> = parent.map;
+	@:constant var updateItem:Item->RawData->Void = parent.updateItem;
+	@:constant var extractKey:RawData->Key = parent.extractKey;
 	
 	@:loaded var list:List<Item> = {
 		revision;
