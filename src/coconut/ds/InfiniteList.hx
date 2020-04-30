@@ -62,7 +62,7 @@ private class InfiniteListImpl<T> implements Model {
 		}
 	}
 	
-	function loadAfter(last, reset = false):coconut.data.Patch<InfiniteListImpl<T>> {
+	function loadAfter(last, reset = false):Promise<coconut.data.Patch<InfiniteListImpl<T>>> {
 		// if(isInTransition) return new Error('Already refreshing');
 		return load(last, perPage)
 			.next(function(v):coconut.data.Patch<InfiniteListImpl<T>> {
