@@ -96,7 +96,7 @@ class IntCollection<RawData, Item> implements coconut.data.Model implements ICol
 	}
 	@:constant var map:Dict<Int, Item> = new Dict(createItem.bind(_, None));
 	
-	public function refresh(cache = None) {
+	@:keep public function refresh(cache = None) {
 		this.cache = cache;
 		revision++;
 	}
@@ -124,7 +124,7 @@ class StringCollection<RawData, Item> implements coconut.data.Model implements I
 	}
 	@:constant var map:Dict<String, Item> = new Dict(createItem.bind(_, None));
 	
-	public function refresh(cache = None) {
+	@:keep public function refresh(cache = None) {
 		this.cache = cache;
 		revision++;
 	}
@@ -152,7 +152,7 @@ class EnumValueCollection<RawData, Item> implements coconut.data.Model implement
 	}
 	@:constant var map:Dict<EnumValue, Item> = new Dict(createItem.bind(_, None));
 	
-	public function refresh(cache = None) {
+	@:keep public function refresh(cache = None) {
 		this.cache = cache;
 		revision++;
 	}

@@ -46,7 +46,7 @@ class SubCollection<Key, RawData, Item> implements coconut.data.Model implements
 		return parent.sub(fetch);
 	}
 	
-	public function refresh(cache = None) {
+    @:keep public function refresh(cache = None) {
 		this.cache = cache;
 		revision++;
 	}

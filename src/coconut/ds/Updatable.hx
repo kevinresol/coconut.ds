@@ -16,7 +16,7 @@ class Updatable<Content, Patch> implements coconut.data.Model {
 		}
 	}
 	
-	public function refresh(cache = None) {
+	@:keep public function refresh(cache = None) {
 		this.cache = cache;
 		revision++;
 	}
