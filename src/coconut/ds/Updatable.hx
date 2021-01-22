@@ -1,7 +1,6 @@
 package coconut.ds;
 
 using tink.CoreApi;
-using tink.state.Promised;
 
 class Updatable<Content, Patch> implements coconut.data.Model {
 	@:constant var loader:Void->Promise<Content>;

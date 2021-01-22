@@ -29,11 +29,15 @@ abstract Collection<K, RawData, Item>(ICollection<K, RawData, Item>) from IColle
 	public inline function get(key:K):Item
 		return this.map.get(key);
 	
-	public inline function sub(fetch:Void->Promise<List<RawData>>):SubCollection<K, RawData, Item> {
+	public inline function sub(fetch:Void->Promise<List<RawData>>):Collection<K, RawData, Item> {
 		return new SubCollection({
 			fetch: fetch,
 			parent: this,
 		});
+	}
+	
+	public inline function collect<V>(f:Item->Promised<V>):Promised<List<V>> {
+		return this.list.flatMap(list -> PromisedTools.all(list.map(f))).map(List.fromArray);
 	}
 	
 	@:to inline function toIntCollection<K:Int, RawData, Item>(init):IntCollection<RawData, Item>
