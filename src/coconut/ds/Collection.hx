@@ -40,6 +40,9 @@ abstract Collection<K, RawData, Item>(ICollection<K, RawData, Item>) from IColle
 		return this.list.flatMap(list -> PromisedTools.all(list.map(f))).map(List.fromArray);
 	}
 	
+	public inline function iterator()
+		return this.list.orNull().iterator();
+	
 	@:to inline function toIntCollection<K:Int, RawData, Item>(init):IntCollection<RawData, Item>
 		return new IntCollection<RawData, Item>(init);
 	
