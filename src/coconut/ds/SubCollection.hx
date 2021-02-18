@@ -20,7 +20,7 @@ using tink.CoreApi;
 class SubCollection<Key, RawData, Item> implements coconut.data.Model implements coconut.ds.Collection.ICollection<Key, RawData, Item> {
 	@:editable private var revision:Int = 0;
 	@:constant var fetch:Void->Promise<List<RawData>>;
-	@:constant var parent:Collection<Key, RawData, Item>;
+	@:constant var parent:coconut.ds.Collection.ICollection<Key, RawData, Item>;
 	@:editable private var cache:Option<List<Item>> = @byDefault None;
 	
 	// forwards
@@ -33,7 +33,7 @@ class SubCollection<Key, RawData, Item> implements coconut.data.Model implements
 		switch cache {
 			case None:
 				fetch().next(function(list) return list.map(function(data) {
-					var item = parent.get(parent.extractKey(data));
+					var item = map.get(parent.extractKey(data));
 					parent.updateItem(item, data);
 					return item;
 				}));
