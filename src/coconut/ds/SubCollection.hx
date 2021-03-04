@@ -1,6 +1,6 @@
 package coconut.ds;
 
-import tink.pure.List;
+import tink.pure.Vector;
 
 using tink.CoreApi;
 
@@ -19,16 +19,16 @@ using tink.CoreApi;
  */
 class SubCollection<Key, RawData, Item> implements coconut.data.Model implements coconut.ds.Collection.ICollection<Key, RawData, Item> {
 	@:editable private var revision:Int = 0;
-	@:constant var fetch:Void->Promise<List<RawData>>;
+	@:constant var fetch:Void->Promise<Vector<RawData>>;
 	@:constant var parent:coconut.ds.Collection.ICollection<Key, RawData, Item>;
-	@:editable private var cache:Option<List<Item>> = @byDefault None;
+	@:editable private var cache:Option<Vector<Item>> = @byDefault None;
 	
 	// forwards
 	@:constant var map:Dict<Key, Item> = parent.map;
 	@:constant var updateItem:Item->RawData->Void = parent.updateItem;
 	@:constant var extractKey:RawData->Key = parent.extractKey;
 	
-	@:loaded var list:List<Item> = {
+	@:loaded var list:Vector<Item> = {
 		revision;
 		switch cache {
 			case None:

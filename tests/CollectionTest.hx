@@ -3,7 +3,7 @@ package;
 import coconut.ds.*;
 import coconut.ds.Collection;
 import tink.anon.*;
-import tink.pure.List;
+import tink.pure.Vector;
 
 using tink.state.Promised;
 using tink.CoreApi;
@@ -18,7 +18,7 @@ class CollectionTest extends Base {
 	
 	public function int() {
 		var collection = new Collection<Int, Data, Model>({
-			fetch: function():Promise<List<Data>> return delay(function() return List.fromArray(server)),
+			fetch: function():Promise<Vector<Data>> return delay(function() return Vector.fromArray(server)),
 			extractKey: function(data:Data):Int return data.id,
 			createItem: function(id:Int, data:Option<Data>):Model {
 				return new Model({
@@ -33,7 +33,7 @@ class CollectionTest extends Base {
 			updateItem: function(model:Model, data:Data) model.refresh(Some(data)),
 		});
 		
-		var sub = collection.sub(function():Promise<List<Data>> return delay(function() return List.fromArray(server.filter(function(v) return v.id == 1))));
+		var sub = collection.sub(function():Promise<Vector<Data>> return delay(function() return Vector.fromArray(server.filter(function(v) return v.id == 1))));
 		
 		asserts.assert(collection.list == Loading);
 		asserts.assert(sub.list == Loading);
