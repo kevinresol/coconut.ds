@@ -43,13 +43,13 @@ abstract Collection<K, RawData, Item>(ICollection<K, RawData, Item>) from IColle
 	public inline function iterator()
 		return this.list.orNull().iterator();
 	
-	@:to inline function toIntCollection<K:Int, RawData, Item>(init):IntCollection<RawData, Item>
+	@:to static inline function toIntCollection<RawData, Item>(c:ICollection<Int, RawData, Item>, init):IntCollection<RawData, Item>
 		return new IntCollection<RawData, Item>(init);
 	
-	@:to inline function toStringCollection<K:String, RawData, Item>(init):StringCollection<RawData, Item>
+	@:to static inline function toStringCollection<RawData, Item>(c:ICollection<String, RawData, Item>, init):StringCollection<RawData, Item>
 		return new StringCollection<RawData, Item>(init);
 	
-	@:to inline function toEnumValueCollection<K:EnumValue, RawData, Item>(init):EnumValueCollection<RawData, Item>
+	@:to static inline function toEnumValueCollection<RawData, Item>(c:ICollection<EnumValue, RawData, Item>, init):EnumValueCollection<RawData, Item>
 		return new EnumValueCollection<RawData, Item>(init);
 	
 	@:from static inline function fromIntCollection<RawData, Item>(collection:IntCollection<RawData, Item>):Collection<Int, RawData, Item>
