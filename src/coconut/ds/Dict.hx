@@ -7,6 +7,9 @@ abstract Dict<K, V>(IDict<K, V>) {
 	public function new(factory:K->V);
 	public inline function get(k:K, ?factory:K->V):V
 		return this.get(k, factory);
+
+	public inline function exists(k:K):Bool
+		return this.exists(k);
 	
 	@:to static inline function toStringDict<K:String, V>(dict:IDict<K, V>, f):StringDict<V>
 		return new StringDict<V>({factory: f});
@@ -29,6 +32,7 @@ abstract Dict<K, V>(IDict<K, V>) {
 
 interface IDict<K, V> {
 	function get(i:K, ?factory:K->V):V;
+	function exists(i:K):Bool;
 }
 
 class IntDict<T> implements coconut.data.Model {
@@ -44,6 +48,9 @@ class IntDict<T> implements coconut.data.Model {
 			map.get(i);
 		}
 	}
+
+	public function exists(k:Int):Bool
+		return map.exists(k);
 }
 
 class StringDict<T> implements coconut.data.Model {
@@ -59,6 +66,9 @@ class StringDict<T> implements coconut.data.Model {
 			map.get(i);
 		}
 	}
+
+	public function exists(k:String):Bool
+		return map.exists(k);
 }
 
 class EnumValueDict<K:EnumValue, T> implements coconut.data.Model {
@@ -74,4 +84,7 @@ class EnumValueDict<K:EnumValue, T> implements coconut.data.Model {
 			map.get(i);
 		}
 	}
+
+	public function exists(k:K):Bool
+		return map.exists(k);
 }
