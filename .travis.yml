@@ -14,6 +14,9 @@ os:
 
 env:
   - HAXE_VERSION=3.4.7
+  - HAXE_VERSION=4.0.5
+  - HAXE_VERSION=4.1.5
+  - HAXE_VERSION=4.2.4
   - HAXE_VERSION=nightly
   
 install:

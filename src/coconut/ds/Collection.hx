@@ -53,13 +53,13 @@ abstract Collection<K, RawData, Item>(ICollection<K, RawData, Item>) from IColle
 		return new EnumValueCollection<RawData, Item>(init);
 	
 	@:from static inline function fromIntCollection<RawData, Item>(collection:IntCollection<RawData, Item>):Collection<Int, RawData, Item>
-		return collection;
+		return cast collection;
 	
 	@:from static inline function fromStringCollection<RawData, Item>(collection:StringCollection<RawData, Item>):Collection<String, RawData, Item>
-		return collection;
+		return cast collection;
 	
 	@:from static inline function fromEnumValueCollection<RawData, Item>(collection:EnumValueCollection<RawData, Item>):Collection<EnumValue, RawData, Item>
-		return collection;
+		return cast collection;
 }
 
 interface ICollection<K, RawData, Item> {
