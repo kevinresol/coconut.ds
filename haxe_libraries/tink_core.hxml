@@ -1,3 +1,3 @@
-# @install: lix --silent download "gh://github.com/haxetink/tink_core#a14155a83f41279a9804d2733114f1404608d24f" into tink_core/1.27.1/github/a14155a83f41279a9804d2733114f1404608d24f
--cp ${HAXE_LIBCACHE}/tink_core/1.27.1/github/a14155a83f41279a9804d2733114f1404608d24f/src
--D tink_core=1.27.1
+# @install: lix --silent download "gh://github.com/haxetink/tink_core#2b9bbd72a60d016f0cf0e11dd88a6cc859cfc18d" into tink_core/2.0.2/github/2b9bbd72a60d016f0cf0e11dd88a6cc859cfc18d
+-cp ${HAXE_LIBCACHE}/tink_core/2.0.2/github/2b9bbd72a60d016f0cf0e11dd88a6cc859cfc18d/src
+-D tink_core=2.0.2
